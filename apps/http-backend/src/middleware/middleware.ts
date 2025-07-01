@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-const JWT_SECRET = process.env.JWT_SECRET!;
+import { JWT_SECRET } from "@repo/backend-common/config";
 
 export function middleware(req: Request, res: Response, next: NextFunction) {
   const token = req.headers["authorization"];
@@ -10,7 +10,7 @@ export function middleware(req: Request, res: Response, next: NextFunction) {
 
   const decoded = jwt.verify(token, JWT_SECRET);
   if (typeof decoded === "object" && "userid" in decoded) {
-    req.userid = (decoded as JwtPayload & { userid: string }).userid;
+    req.userid = decoded.userid;
     next();
   } else {
     res.status(404).json({
