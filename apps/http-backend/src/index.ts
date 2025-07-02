@@ -1,4 +1,5 @@
-require("dotenv").config;
+import dotenv from "dotenv";
+dotenv.config();
 
 import express from "express";
 import jwt from "jsonwebtoken";
@@ -12,6 +13,12 @@ import { prismaClient } from "@repo/db/client";
 
 const app = express();
 app.use(express.json());
+
+app.get("/pong", function (req, res) {
+  res.json({
+    message: "ada pada",
+  });
+});
 
 app.post("/signup", async function (req, res) {
   const parseData = createUserSchema.safeParse(req.body);
@@ -39,39 +46,51 @@ app.post("/signup", async function (req, res) {
       message: "user already exist with this email",
     });
   }
-
-  res.json({
-    userId: 123,
-  });
 });
 
-app.post("/signin", async function (req, res) {
-  const parseData = signInSchema.safeParse(req.body);
-  if (!parseData.success) {
-    console.log(parseData.error);
+app.post("/signin", async (req, res) => {
+  console.log("➡️ /signin route hit");
 
-    return;
-  }
+  try {
+    const parsedData = signInSchema.safeParse(req.body);
+    console.log("Parsed data:", parsedData);
 
-  const user = await prismaClient.user.findFirst({
-    where: {
-      username: parseData.data.username,
-      password: parseData.data.password,
-    },
-  });
-  if (!user) {
-    res.status(403).json({
-      message: "user doesn't exist",
+    if (!parsedData.success) {
+      console.log("❌ Zod validation failed:", parsedData.error);
+      res.status(400).json({ message: "Incorrect inputs" });
+      return;
+    }
+
+    const user = await prismaClient.user.findFirst({
+      where: {
+        username: parsedData.data.username,
+      },
     });
+
+    console.log("🔍 Found user:", user);
+
+    if (!user || user.password !== parsedData.data.password) {
+      console.log("❌ User not found or password mismatch");
+      res.status(403).json({ message: "Not authorized" });
+      return;
+    }
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error(
+        " JWT_SECRET is not defined. Please check your environment configuration."
+      );
+    }
+
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
+    console.log("✅ Token generated");
+
+    res.json({ token });
+    return;
+  } catch (err) {
+    console.error("🔥 Signin error:", err);
+    res.status(500).json({ message: "Internal Server Error" });
     return;
   }
-  if (!process.env.JWT_SECRET) {
-    throw new Error(
-      " JWT_SECRET is not defined. Please check your environment configuration."
-    );
-  }
-
-  jwt.sign({ user }, process.env.JWT_SECRET);
 });
 
 app.post("/room", middleware, async function (req, res) {
