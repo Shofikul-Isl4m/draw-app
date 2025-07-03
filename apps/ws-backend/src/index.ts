@@ -1,27 +1,83 @@
-import { WebSocketServer } from "ws";
-import jwt from "jsonwebtoken";
-const JWT_SECRET =process.env.JWT_SECRET;
+import { WebSocketServer, WebSocket } from "ws";
+import jwt, { decode } from "jsonwebtoken";
+
 const wss = new WebSocketServer({ port: 8080 });
+
+interface User {
+  rooms: string[];
+  userId: string;
+  ws: WebSocket;
+}
+
+const users: User[] = [];
+
+function checkUser(token: string): string | null {
+  if (!process.env.JWT_SECRET) {
+    console.log(process.env.JWT_SECRET);
+    throw new Error("problem with jwt secret in ws");
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  if (typeof decoded === "string") {
+    return null;
+  }
+  if (!decoded || !decoded.userId) {
+    return null;
+  }
+  return decoded.userId;
+}
 
 wss.on("connection", function connection(ws, request) {
   const url = request.url;
   if (!url) {
     return;
   }
-  if (!JWT_SECRET) {
-    throw new Error(" JWT_SECRET is not defined. Please check your environment configuration.");
-  }
+
   const queryParams = new URLSearchParams(url.split("?")[1]);
   const token = queryParams.get("token")!;
-  const decoded = jwt.verify(token, JWT_SECRET);
-  if (
-    !(typeof decoded === "object" && "userid" in decoded) ||
-    !decoded.userid
-  ) {
+  const userId = checkUser(token);
+
+  if (!userId) {
     ws.close();
     return;
   }
+
+  users.push({
+    userId,
+    rooms: [],
+    ws,
+  });
+
   ws.on("message", function message(data) {
-    ws.send("pong");
+    const stringData = typeof data === "string" ? data : data.toString();
+    const parseData = JSON.parse(stringData);
+    if (parseData.type === "join_room") {
+      const user = users.find((x) => x.ws === ws);
+      user?.rooms.push(parseData.roomId);
+    }
+
+    if (parseData.type === "leave_room") {
+      const user = users.find((x) => x.ws === ws);
+      if (!user) {
+        return;
+      }
+      user.rooms = user.rooms.filter((x) => x !== parseData.room);
+    }
+
+    if (parseData.type === "chat") {
+      const roomId = parseData.roomId;
+      const message = parseData.message;
+      users.forEach((user) => {
+        if (user.rooms.includes(roomId)) {
+          user.ws.send(
+            JSON.stringify({
+              type: "chat",
+              message,
+              roomId,
+            })
+          );
+        }
+      });
+    }
   });
 });
