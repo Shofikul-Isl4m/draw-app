@@ -1,5 +1,8 @@
 import { WebSocketServer, WebSocket } from "ws";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
+import { prismaClient } from "@repo/db/client";
 
 const wss = new WebSocketServer({ port: 8080 });
 
@@ -12,19 +15,23 @@ interface User {
 const users: User[] = [];
 
 function checkUser(token: string): string | null {
-  if (!process.env.JWT_SECRET) {
-    console.log(process.env.JWT_SECRET);
-    throw new Error("problem with jwt secret in ws");
-  }
+  try {
+    if (!process.env.JWT_SECRET) {
+      console.log(process.env.JWT_SECRET, "asdsa");
+      throw new Error("problem with jwt secret in ws");
+    }
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  if (typeof decoded === "string") {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (typeof decoded === "string") {
+      return null;
+    }
+    if (!decoded || !decoded.userId) {
+      return null;
+    }
+    return decoded.userId;
+  } catch (e) {
     return null;
   }
-  if (!decoded || !decoded.userId) {
-    return null;
-  }
-  return decoded.userId;
 }
 
 wss.on("connection", function connection(ws, request) {
@@ -48,7 +55,7 @@ wss.on("connection", function connection(ws, request) {
     ws,
   });
 
-  ws.on("message", function message(data) {
+  ws.on("message", async function message(data) {
     const stringData = typeof data === "string" ? data : data.toString();
     const parseData = JSON.parse(stringData);
     if (parseData.type === "join_room") {
@@ -62,11 +69,13 @@ wss.on("connection", function connection(ws, request) {
         return;
       }
       user.rooms = user.rooms.filter((x) => x !== parseData.room);
+      console.log("Rooms after leaving:", user.rooms);
     }
 
     if (parseData.type === "chat") {
       const roomId = parseData.roomId;
       const message = parseData.message;
+
       users.forEach((user) => {
         if (user.rooms.includes(roomId)) {
           user.ws.send(
@@ -77,6 +86,13 @@ wss.on("connection", function connection(ws, request) {
             })
           );
         }
+      });
+      await prismaClient.chat.create({
+        data: {
+          roomId,
+          message,
+          userId,
+        },
       });
     }
   });
