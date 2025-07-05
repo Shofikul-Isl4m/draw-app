@@ -2,9 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import authRouter from "./routes/authRouter.js";
-import roomRouter from "./routes/roomRouter.js";
-import contentRouter from "./routes/contentRouter.js";
+import authRouter from "./routes/auth.router.js";
+import roomRouter from "./routes/room.router.js";
+import contentRouter from "./routes/content.router.js";
 import cors from "cors";
 
 const app = express();

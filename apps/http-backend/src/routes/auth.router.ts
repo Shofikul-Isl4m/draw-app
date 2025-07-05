@@ -6,7 +6,7 @@ import {
   signinController,
   signoutController,
   signupController,
-} from "../controllers/authControllers.js";
+} from "../controllers/auth.controller.js";
 
 const router: Router = Router();
 
