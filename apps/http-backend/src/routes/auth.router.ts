@@ -1,12 +1,12 @@
 import { Router } from "express";
 
-import { middleware } from "../middleware/middleware.js";
 import {
   infoController,
   signinController,
   signoutController,
   signupController,
 } from "../controllers/auth.controller.js";
+import { middleware } from "../middleware/middleware.js";
 
 const router: Router = Router();
 

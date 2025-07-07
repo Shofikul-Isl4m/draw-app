@@ -10,9 +10,10 @@ export function middleware(req: Request, res: Response, next: NextFunction) {
   }
 
   if (!token) {
-    return res.status(401).json({
+    res.status(401).json({
       message: " Authentication required",
     });
+    return;
   }
   try {
     if (!process.env.JWT_SECRET) {

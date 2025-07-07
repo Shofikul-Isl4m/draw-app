@@ -1,5 +1,10 @@
 import { Router } from "express";
 import { middleware } from "../middleware/middleware.js";
+import {
+  createRoomController,
+  fetchAllRoomsController,
+  joinRoomController,
+} from "../controllers/room.controller.js";
 
 const roomRouter: Router = Router();
 
