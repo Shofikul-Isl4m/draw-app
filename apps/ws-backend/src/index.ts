@@ -264,12 +264,9 @@ wss.on("connection", async function connection(ws, request) {
   }
 
   try {
-    const verified = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as JwtPayload;
+    const verified = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
-      if (!verified?.id) {
+    if (!verified?.id) {
       console.log("User not authorised");
       ws.send(
         JSON.stringify({
@@ -286,18 +283,34 @@ wss.on("connection", async function connection(ws, request) {
     });
 
     if (!userFound) {
-      console.log("user does not exist")
-      ws.send(JSON.stringify({
-        type: "error_message",
-        content: "user does not exist"
-      })
-
+      console.log("user does not exist");
+      (ws.send(
+        JSON.stringify({
+          type: "error_message",
+          content: "user does not exist",
+        })
       ),
-        ws.close()
-      return
-     }
-    
+        ws.close());
+      return;
+    }
 
-
+    userVerificationStatus.set(ws, { verified: true, userId: verified.id });
+    ws.send(
+      JSON.stringify({
+        type: " connection_ready",
+        userId: verified.id,
+      })
+    );
+  } catch (e) {
+    console.log(e);
+    console.log("Error verifing user");
+    ws.send(
+      JSON.stringify({
+        type: "error_message",
+        content: "Error verifing User",
+      })
+    );
+    ws.close();
+    return;
   }
 });
