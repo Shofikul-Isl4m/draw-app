@@ -1,0 +1,21 @@
+export async function signupAction(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const rawFormData = {
+    name: `${formData.get("firstname")} ${formData.get("lastname")}`,
+    username: `${formData.get("username")}`,
+    password: `${formData.get("password")}`,
+  };
+
+  if (formData.get("password") !== formData.get("verify-password")) {
+    return { message: "Passwords do not match." };
+  }
+
+  const validatedFields = UserSignupSchema.safeParse(rawFormData);
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Validation failed. Please check your inputs.",
+    };
+  }
