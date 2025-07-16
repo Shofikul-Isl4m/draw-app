@@ -9,13 +9,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@repo/ui/components/ui/sidebar";
-
-import SideBarItem from "./SideBarItem";
 import { History } from "../icons/animated/History";
 import { HomeIcon } from "../icons/animated/Home";
+
+import SideBarItem from "./SideBarItem";
 import { NavUser } from "../Root-user";
 
-// Menu items.
 const items = [
   {
     title: "Dashboard",
@@ -31,24 +30,24 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar variant="inset">
-      <SidebarContent className="ju flex flex-col">
-        <SidebarHeader className="flex font-pencerio text-black text-2xl font-semibold flex-row items-center justify-between max-md:p-4">
+    <Sidebar variant="inset" className="">
+      <SidebarContent className="flex flex-col">
+        <SidebarHeader className="flex  flex-row items-center justify-between font-pencerio font-semibold text-2xl max-md:p-4">
           Cdraw
           <div className="max-md:hidden">
             <NavUser />
           </div>
         </SidebarHeader>
-        <SidebarGroup className="mt-10 flex-1">
+        <SidebarGroup className="mt-10 flex-1 ">
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2">
+            <SidebarMenu className="space-y-2 ">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <SideBarItem
                       icon={item.icon}
-                      title={item.title}
                       url={item.url}
+                      title={item.title}
                     />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
