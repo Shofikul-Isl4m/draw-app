@@ -24,9 +24,11 @@ import AccountDialog from "./shared/AccountDialog";
 
 import Downitem from "./Downitem";
 import { LogoutButton } from "./shared/LogoutButton";
+import { useAppSelector } from "@/lib/hooks/redux";
 
 export function NavUser() {
   //   const { data, isLoading } = useUser();
+  let user = useAppSelector((state) => state.app.user);
   const isLoading = false;
 
   return (
@@ -38,10 +40,7 @@ export function NavUser() {
               <div className="size-5 animate-pulse rounded-full bg-neutral-200 sm:size-6" />
             ) : (
               <>
-                <AvatarImage
-                //   src={data?.user?.image ?? ""}
-                //   alt={data?.user?.name}
-                />
+                <AvatarImage src={user?.name[0]} />
                 <AvatarFallback className="size-5 rounded-lg bg-neutral-200 text-xs font-medium sm:size-6">
                   <FilledUser className="size-4 fill-black/70 stroke-black/80 sm:size-5" />
                 </AvatarFallback>

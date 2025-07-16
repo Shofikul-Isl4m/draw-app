@@ -31,9 +31,9 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar variant="inset" className="bg-neutral-100">
+    <Sidebar variant="inset">
       <SidebarContent className="ju flex flex-col">
-        <SidebarHeader className="flex font-pencerio text-black text-2xl font-extrabold flex-row items-center justify-between max-md:p-4">
+        <SidebarHeader className="flex font-pencerio text-black text-2xl font-semibold flex-row items-center justify-between max-md:p-4">
           Cdraw
           <div className="max-md:hidden">
             <NavUser />
