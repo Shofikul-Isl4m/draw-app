@@ -9,7 +9,7 @@ const generateJoinCode = customAlphabet(alphabet, 6);
 export async function createRoomController(req: Request, res: Response) {
   try {
     const userId = req.userid;
-    const title = req.body.title;
+    const { title } = req.body;
 
     if (!userId) {
       res.status(401).json({
@@ -30,6 +30,7 @@ export async function createRoomController(req: Request, res: Response) {
         title: title.trim(),
         joinCode,
         adminId: userId,
+
         participants: {
           connect: [{ id: userId }],
         },

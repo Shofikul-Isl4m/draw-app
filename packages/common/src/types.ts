@@ -11,8 +11,14 @@ export const UserSigninSchema = z.object({
   password: z.string().min(8),
 });
 
-export const CreateRoomSchema = z.object({
-  title: z.string(),
+export const createRoomSchema = z.object({
+  title: z.string().min(1, "Room name is required"),
+
+  maxTimeLimit: z.number().min(1, "Time limit must be at least 1 minute"),
+  maxUsers: z
+    .number()
+    .min(2, "Room must allow at least 2 users")
+    .max(200, "Maximum 200 users allowed"),
 });
 
 export const JoinRoomSchema = z.object({

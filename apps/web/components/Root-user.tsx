@@ -17,6 +17,9 @@ import FilledUser from "./icons/FilledUser";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { UserIcon } from "./icons/animated/user";
 import { LogoutButton } from "./shared/LogoutButton";
+import Downitem from "./Downitem";
+import { Sparkle } from "lucide-react";
+import { title } from "process";
 
 export function NavUser() {
   const loading = false;
@@ -25,7 +28,7 @@ export function NavUser() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <SidebarMenuButton asChild>
-          <Avatar className="group relative size-5 bg-neutral-200 rounded-full p-0  outline-none ring-offset-1 ring-offset-neutral-100 transition-all duration-200 ease-in-out hover:ring-2 hover:ring-black/10 focus-visible:ring-2 focus-visible:ring-black/50 active:ring-red-500 data-[state='open']:ring-green/15  sm:size-6 ">
+          <Avatar className="group relative size-5 bg-neutral-200 rounded-full p-0  outline-none ring-offset-1 ring-offset-neutral-100 transition-all duration-200 ease-in-out hover:ring-2 hover:ring-black/10 focus-visible:ring-2 focus-visible:ring-black/50  data-[state='open']:ring-green/15  sm:size-6 ">
             {loading ? (
               <div className="size-5 animate-pulse rounded-full bg-neutral-200 sm:size-6 "></div>
             ) : (
@@ -45,7 +48,7 @@ export function NavUser() {
         sideOffset={4}
       >
         <DropdownMenuLabel className="p-0 font-normal">
-          <div className=" flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+          <div className="   flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="size-6 rounded-lg sm:size-8">
               {loading ? (
                 <div className="size-6 animate-pulse rounded-full bg-neutral-200 sm:size-8"></div>
@@ -67,6 +70,22 @@ export function NavUser() {
             </div>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          {<Downitem icon={<Sparkle />} title={"upgrade to pro"}></Downitem>}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          {
+            <div className="flex items-center w-full gap-3 rounded cursor-pointer px-2 py-1.5 text-left text-sm hover:bg-neutral-100">
+              <UserIcon className="size-4 text-gray-600" />
+              <span className="text-gray-600">Account</span>
+            </div>
+          }
+
+          <LogoutButton />
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
